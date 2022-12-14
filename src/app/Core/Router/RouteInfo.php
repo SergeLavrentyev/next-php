@@ -13,8 +13,11 @@ class RouteInfo implements RouteInfoInterface
     private string $regex = '';
     private string $controllerPattern = '\\App\\{module}\\Controller\\{module}Controller';
 
+    /**
+     * @param string $route
+     */
     public function __construct(
-        protected string $route
+        protected readonly string $route
     ) {
     }
 

@@ -13,8 +13,8 @@ class HttpException extends \Exception
      * @param Throwable|null $previous
      */
     public function __construct(
-        HttpStatus $httpStatus, string $errorInfo = '', ?Throwable $previous = null)
-    {
+        HttpStatus $httpStatus, string $errorInfo = '', ?Throwable $previous = null
+    ) {
         $message = $httpStatus->getErrorText() . "\n" . $errorInfo;
         $code = $httpStatus->value;
 
