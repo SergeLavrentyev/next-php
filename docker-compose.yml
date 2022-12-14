@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: docker/services/php/${PHP_VERSION}/Dockerfile
+      args:
+        uid: ${USER_UID}
+        user: ${USER_NAME}
+    container_name: ${DOCKER_PROJECT_NAME}_php
+    image: ${DOCKER_PROJECT_NAME}_php
+    restart: always
+    working_dir: ${DOCKER_PROJECT_PATCH}/src
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ${PWD}/:${DOCKER_PROJECT_PATCH}
+      - ${PWD}/docker/services/php/${PHP_VERSION}/php.ini:${PHP_INI_DIR}/php.ini
+      - ${PWD}/docker/services/php/${PHP_VERSION}/xdebug.ini:${PHP_INI_DIR}/conf.d/xdebug.ini
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: docker/services/nginx/${NGINX_VERSION}/Dockerfile
+    container_name: ${DOCKER_PROJECT_NAME}_nginx
+    image: ${DOCKER_PROJECT_NAME}_nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ${PWD}/:${DOCKER_PROJECT_PATCH}
+      - ${PWD}/docker/services/nginx/templates/:/etc/nginx/templates
+    env_file:
+      - ${PWD}/.env
+
+  db:
+    build:
+      context: ./
+      dockerfile: docker/services/mysql/${MYSQL_VERSION}/Dockerfile
+    container_name: ${DOCKER_PROJECT_NAME}_db
+    image: ${DOCKER_PROJECT_NAME}_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ${PWD}/docker/services/mysql/${MYSQL_VERSION}/conf/custom.cnf:/etc/mysql/custom.cnf
