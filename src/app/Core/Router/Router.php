@@ -2,7 +2,6 @@
 
 namespace App\Core\Router;
 
-use App\Core\Container\Contract\ContainerInterface;
 use App\Core\Request\Contract\RequestInterface;
 use App\Core\Router\Attribute\Route;
 use App\Core\Router\Contract\RouteInfoManagerInterface;
@@ -12,6 +11,7 @@ use App\Core\Router\Exception\NotAllowedHttpMethodException;
 use App\Core\Router\Exception\RouteNotFoundException;
 use App\Core\Router\RouteInfo\BuilderFactory;
 use App\Core\Router\RouteInfo\Manager;
+use Psr\Container\ContainerInterface;
 
 class Router implements RouterInterface
 {

@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Core\Container\Contract\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use App\Core\Request\Contract\RequestInterface;
 use App\Core\Router\Contract\RouterInterface;
 

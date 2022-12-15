@@ -3,7 +3,7 @@
 namespace App\Core\Container;
 
 use App\Core\Container\Attribute\Bind;
-use App\Core\Container\Contract\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
