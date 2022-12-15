@@ -26,13 +26,17 @@ class Router implements RouterInterface
         if (is_null($requestMethod)) {
             throw new NotAllowedHttpMethodException();
         }
+
         $requestRoute = explode('?',$request->getUri())[0];
 
         $requestRouteInfo = $this->getRouteInfoManager()
             ->createFromRequestRoute($requestRoute);
 
-
-        $controller = new \ReflectionClass($requestRouteInfo->getController());
+        try {
+            $controller = new \ReflectionClass($requestRouteInfo->getController());
+        } catch (\Exception $e) {
+            throw new RouteNotFoundException($e->getMessage());
+        }
 
         $action = null;
 

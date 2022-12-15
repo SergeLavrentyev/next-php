@@ -3,11 +3,12 @@
 namespace App\Core\Container;
 
 use App\Core\Container\Attribute\Bind;
+use App\Core\Container\Exception\ContainerException;
+use App\Core\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
-
     private array $entries = [];
     private array $resolved = [];
 
@@ -55,6 +56,9 @@ class Container implements ContainerInterface
     /**
      * @param string $id
      * @return mixed
+     * @throws NotFoundException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \ReflectionException
      */
     protected function resolve(string $id): mixed
@@ -71,8 +75,10 @@ class Container implements ContainerInterface
             }
         }
 
+        $this->bind($id, $class);
+
         if (!$reflectionClass->isInstantiable()) {
-            throw new \Exception('non extenciable');
+            throw new ContainerException('non extenciable');
         }
 
         $constructor = $reflectionClass->getConstructor();
@@ -95,18 +101,18 @@ class Container implements ContainerInterface
             }
 
             if (is_null($type)) {
-                throw new \Exception("Constructor $id error: type not specified for $type");
+                throw new ContainerException("Constructor $id error: type not specified for $type");
             }
 
             if ($type instanceof \ReflectionUnionType) {
-                throw new \Exception('Reflection type');
+                throw new ContainerException('Reflection type');
             }
 
             if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
                 return $this->get($type->getName());
             }
 
-            throw new \Exception('Failed to resolve class');
+            throw new NotFoundException('Failed to resolve class');
         }, $parameters);
 
         return $this->resolved[$id] = $reflectionClass->newInstanceArgs($dependencies);
