@@ -5,13 +5,22 @@ declare(strict_types=1);
 namespace App\User\Controller;
 
 use App\Core\Router\Attribute\Get;
+use App\User\Contract\UserServiceInterface;
 
 class UserController
 {
+    /**
+     * @param UserServiceInterface $userService
+     */
+    public function __construct(
+        protected UserServiceInterface $userService
+    ) {
+    }
+
     #[Get('/user')]
     public function index()
     {
-        echo 'USER:INDEX';
+        echo 'USER:INDEX ' . $this->userService->get();
     }
 
     /**

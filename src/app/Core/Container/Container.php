@@ -2,6 +2,7 @@
 
 namespace App\Core\Container;
 
+use App\Core\Container\Attribute\Bind;
 use App\Core\Container\Contract\ContainerInterface;
 
 class Container implements ContainerInterface
@@ -59,6 +60,16 @@ class Container implements ContainerInterface
     protected function resolve(string $id): mixed
     {
         $reflectionClass = new \ReflectionClass($id);
+        $class = $id;
+
+        if ($reflectionClass->isInterface()) {
+            $bindAttribute = $reflectionClass->getAttributes(Bind::class);
+
+            foreach ($bindAttribute as $attribute) {
+                $class = $attribute->newInstance()->object;
+                $reflectionClass = new \ReflectionClass($class);
+            }
+        }
 
         if (!$reflectionClass->isInstantiable()) {
             throw new \Exception('non extenciable');
@@ -67,13 +78,13 @@ class Container implements ContainerInterface
         $constructor = $reflectionClass->getConstructor();
 
         if (is_null($constructor)) {
-            return $this->resolved[$id] = new $id();
+            return $this->resolved[$id] = new $class();
         }
 
         $parameters = $constructor->getParameters();
 
         if (empty($parameters)) {
-            return $this->resolved[$id] = new $id();
+            return $this->resolved[$id] = new $class();
         }
 
         $dependencies = array_map(function (\ReflectionParameter $parameter) use ($id): mixed {
